@@ -1,5 +1,5 @@
 {
-    "name": "ryangjchandler/blade-cache-directive",
+    "name": "reckless/blade-cache-directive",
     "description": "Cache chunks of your Blade markup with ease.",
     "keywords": [
         "ryangjchandler",
