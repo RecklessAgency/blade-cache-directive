@@ -22,14 +22,15 @@ class BladeCacheDirectiveServiceProvider extends PackageServiceProvider
             return "<?php
                 \$__cache_directive_arguments = [{$expression}];
                 \$__cache_directive_tags = []; // Default empty tags
+                \$__cache_directive_key = '';
+                \$__cache_directive_ttl = config('blade-cache-directive.ttl');
 
-                if (count(\$__cache_directive_arguments) === 3) {
-                    [\$__cache_directive_key, \$__cache_directive_ttl, \$__cache_directive_tags] = \$__cache_directive_arguments;
-                } elseif (count(\$__cache_directive_arguments) === 2) {
-                    [\$__cache_directive_key, \$__cache_directive_ttl] = \$__cache_directive_arguments;
-                } else {
-                    [\$__cache_directive_key] = \$__cache_directive_arguments;
-                    \$__cache_directive_ttl = config('blade-cache-directive.ttl');
+                if (count(\$__cache_directive_arguments) >= 3) {
+                    list(\$__cache_directive_key, \$__cache_directive_ttl, \$__cache_directive_tags) = \$__cache_directive_arguments;
+                } elseif (count(\$__cache_directive_arguments) == 2) {
+                    list(\$__cache_directive_key, \$__cache_directive_ttl) = \$__cache_directive_arguments;
+                } elseif (count(\$__cache_directive_arguments) == 1) {
+                    list(\$__cache_directive_key) = \$__cache_directive_arguments;
                 }
 
                 if (config('blade-cache-directive.enabled')) {
@@ -41,10 +42,10 @@ class BladeCacheDirectiveServiceProvider extends PackageServiceProvider
 
                     if (\$cacheStore->has(\$__cache_directive_key)) {
                         echo \$cacheStore->get(\$__cache_directive_key);
-                    } else {
-                        \$__cache_directive_buffering = true;
-                        ob_start();
+                        return;
                     }
+
+                    ob_start();
                 }
             ?>";
         });
@@ -65,7 +66,7 @@ class BladeCacheDirectiveServiceProvider extends PackageServiceProvider
                     }
 
                     unset(\$__cache_directive_key, \$__cache_directive_ttl, \$__cache_directive_buffer, \$__cache_directive_buffering, \$__cache_directive_arguments, \$__cache_directive_tags, \$cacheStore);
-            ?>";
+                ?>";
         });
     }
 }
